@@ -1,0 +1,4 @@
+The package yamc provides CMake integration:
+
+    find_package(yamc CONFIG REQUIRED)
+    target_include_directories(main PRIVATE ${yamc_INCLUDE_DIRS})

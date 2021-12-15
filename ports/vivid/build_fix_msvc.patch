@@ -1,0 +1,11 @@
+diff -urN a/include/vivid/colormap.h b/include/vivid/colormap.h
+--- a/include/vivid/colormap.h	2019-06-04 06:29:01.000000000 +0800
++++ b/include/vivid/colormap.h	2021-12-14 10:54:52.269223800 +0800
+@@ -17,6 +17,7 @@
+ 
+ #include "vivid/types.h"
+ #include <vector>
++#include <string>
+ 
+ namespace vivid {
+ 

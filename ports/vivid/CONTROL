@@ -1,0 +1,5 @@
+Source: vivid
+Build-Depends: glm, nlohmann-json
+Version: 3.0.1
+Homepage: https://github.com/gurki/vivid
+Description: A simple-to-use cpp color library

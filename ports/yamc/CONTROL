@@ -1,0 +1,4 @@
+Source: yamc
+Version: 2020-01-30
+Description: C++ mutex collections, cross-platform header-only C++11 (or later) library.
+Homepage: https://github.com/yohhoy/yamc.git
