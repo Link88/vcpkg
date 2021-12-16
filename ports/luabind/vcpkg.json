@@ -2,5 +2,8 @@
   "name": "luabind",
   "version-string": "0.9.1",
   "port-version": 1,
-  "description": "A lightweight, dependency-free library for binding Lua to C++"
+  "description": "A lightweight, dependency-free library for binding Lua to C++",
+  "dependencies": [
+    "lua"
+  ]
 }
