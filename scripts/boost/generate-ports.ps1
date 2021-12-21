@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     $libraries = @(),
-    $version = "1.77.0",
+    $version = "1.78.0",
     $portsDir = $null
 )
 
@@ -24,14 +24,6 @@ else {
 # Clear this array when moving to a new boost version
 $portVersions = @{
     #e.g. "boost-asio" = 1;
-    "boost"                      = 2;
-    "boost-config"               = 2;
-    "boost-gil"                  = 1;
-    "boost-iostreams"            = 1;
-    "boost-modular-build-helper" = 3;
-    "boost-odeint"               = 1;
-    "boost-python"               = 1;
-    "boost-process"              = 2;
 }
 
 $portData = @{
@@ -44,54 +36,75 @@ $portData = @{
         }
     };
     "boost-asio"             = @{
-        "dependencies" = @("openssl");
-        "supports"     = "!emscripten"
+        "features" = @{
+            "ssl" = @{
+                "description"  = "Build with SSL support";
+                "dependencies" = @(@{ "name" = "openssl"; "platform" = "!emscripten" });
+            }
+        }
     };
     "boost-beast"            = @{ "supports" = "!emscripten" };
-    "boost-fiber"            = @{ "supports" = "!osx&!uwp&!arm&!emscripten" };
+    "boost-fiber"            = @{
+        "supports" = "!osx & !uwp & !arm & !emscripten";
+        "features" = @{
+            "numa" = @{
+                "description" = "Enable NUMA support";
+            }
+        } 
+    };
     "boost-filesystem"       = @{ "supports" = "!uwp" };
     "boost-iostreams"        = @{
         "default-features" = @("bzip2", "lzma", "zlib", "zstd");
         "supports"         = "!uwp";
         "features"         = @{
             "bzip2" = @{
+                "description"  = "Support bzip2 filters";
                 "dependencies" = @("bzip2");
-                "description"  = "Support bzip2 filters"
             };
             "lzma"  = @{
+                "description"  = "Support LZMA/xz filters";
                 "dependencies" = @("liblzma");
-                "description"  = "Support LZMA/xz filters"
             };
             "zlib"  = @{
+                "description"  = "Support zlib filters";
                 "dependencies" = @("zlib");
-                "description"  = "Support zlib filters"
             };
             "zstd"  = @{
+                "description"  = "Support zstd filters";
                 "dependencies" = @("zstd");
-                "description"  = "Support zstd filters"
             };
         };
     };
-    "boost-context"          = @{ "supports" = "!uwp&!emscripten" };
+    "boost-context"          = @{ "supports" = "!uwp & !emscripten" };
     "boost-stacktrace"       = @{ "supports" = "!uwp" };
-    "boost-coroutine"        = @{ "supports" = "!arm&!uwp&!emscripten" };
+    "boost-coroutine"        = @{ "supports" = "!arm & !uwp & !emscripten" };
     "boost-coroutine2"       = @{ "supports" = "!emscripten" };
     "boost-test"             = @{ "supports" = "!uwp" };
     "boost-wave"             = @{ "supports" = "!uwp" };
-    "boost-log"              = @{ "supports" = "!uwp&!emscripten" };
+    "boost-log"              = @{ "supports" = "!uwp & !emscripten" };
     "boost-locale"           = @{
-        "dependencies" = @(@{ "name" = "libiconv"; "platform" = "!uwp&!windows&!mingw" });
+        "dependencies" = @(@{ "name" = "libiconv"; "platform" = "!uwp & !windows & !mingw" });
         "supports"     = "!uwp";
         "features"     = @{
             "icu" = @{
+                "description"  = "ICU backend for Boost.Locale";
                 "dependencies" = @("icu");
-                "description"  = "ICU backend for Boost.Locale"
             }
         }
     };
     "boost-mpi"              = @{
         "dependencies" = @("mpi");
         "supports"     = "!uwp";
+        "features"     = @{
+            "python2" = @{
+                "description"  = "Build Python2 bindings";
+                "dependencies" = @(@{ "name" = "boost-python"; "features" = @( "python2" ); "platform" = "!uwp & !(arm & windows) & !emscripten & !ios & !android" }, "python2");
+            };
+            "python3" = @{
+                "description"  = "Build Python3 bindings";
+                "dependencies" = @(@{ "name" = "boost-python"; "features" = @( "python3" ); "platform" = "!uwp & !emscripten & !ios & !android" }, "python3");
+            }
+        }
     };
     "boost-graph-parallel"   = @{
         "dependencies" = @("mpi");
@@ -100,8 +113,8 @@ $portData = @{
     "boost-odeint"           = @{
         "features" = @{
             "mpi" = @{
+                "description"  = "Support parallelization with MPI";
                 "dependencies" = @("boost-mpi");
-                "description"  = "Support parallelization with MPI"
             }
         }
     };
@@ -109,23 +122,23 @@ $portData = @{
     "boost-process"          = @{ "supports" = "!emscripten" };
     "boost-python"           = @{
         "default-features" = @("python3");
-        "supports"         = "!uwp&!(arm&windows)&!emscripten";
+        "supports"         = "!uwp & !emscripten & !ios & !android";
         "features"         = @{
             "python2" = @{
+                "description"  = "Build with Python2 support";
                 "dependencies" = @("python2");
-                "description"  = "Build with Python2 support"
             };
             "python3" = @{
+                "description"  = "Build with Python3 support";
                 "dependencies" = @("python3");
-                "description"  = "Build with Python3 support"
             }
         }
     };
     "boost-regex"            = @{
         "features" = @{
             "icu" = @{
+                "description"  = "ICU backend for Boost.Regex";
                 "dependencies" = @("icu");
-                "description"  = "ICU backend for Boost.Regex"
             }
         }
     }
@@ -489,7 +502,7 @@ foreach ($library in $libraries) {
             elseif ($_ -eq "nondet_random.hpp") { "random" }
             elseif ($_ -match "cregex.hpp|regex_fwd.hpp") { "regex" }
             elseif ($_ -eq "archive") { "serialization" }
-            elseif ($_ -match "^signals$|last_value.hpp|signal.hpp|signals.hpp") { "signals" }
+            elseif ($_ -match "last_value.hpp|signal.hpp") { "signals" }
             elseif ($_ -match "enable_shared_from_this.hpp|intrusive_ptr.hpp|make_shared.hpp|make_unique.hpp|pointer_cast.hpp|pointer_to_other.hpp|scoped_array.hpp|scoped_ptr.hpp|shared_array.hpp|shared_ptr.hpp|weak_ptr.hpp") { "smart_ptr" }
             elseif ($_ -eq "cerrno.hpp") { "system" }
             elseif ($_ -eq "progress.hpp") { "timer" }
@@ -571,7 +584,20 @@ if ($updateServicePorts) {
         -Description "Internal vcpkg port used to build Boost libraries" `
         -Dependencies @("boost-uninstall")
 
-    # Update Boost version in boost-modular-build.cmake
-    $boost_modular_build = "$portsDir/boost-modular-build-helper/boost-modular-build.cmake"
-    (Get-Content -LiteralPath "$boost_modular_build") -replace "set\(BOOST_VERSION ([0-9\.]+)\)", "set(BOOST_VERSION $version)" | Set-Content -LiteralPath "$boost_modular_build"
+    # Generate manifest files for boost-build
+    GeneratePortManifest `
+        -PortName "boost-build" `
+        -Homepage "https://github.com/boostorg/build" `
+        -Description "Boost.Build" `
+        -Dependencies @("boost-uninstall")
+
+    # Update Boost version in CMake files
+    [Array]$files_with_boost_version = @(
+        "$portsDir/boost-build/portfile.cmake",
+        "$portsDir/boost-modular-build-helper/boost-modular-build.cmake",
+        "$portsDir/boost-vcpkg-helpers/boost-modular-headers.cmake"
+    )
+    foreach ($file in $files_with_boost_version) {
+        (Get-Content -LiteralPath "$file") -replace "set\(BOOST_VERSION ([0-9\.]+)\)", "set(BOOST_VERSION $version)" | Set-Content -LiteralPath "$file"
+    }
 }
